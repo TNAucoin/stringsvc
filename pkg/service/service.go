@@ -1,4 +1,4 @@
-package main
+package service
 
 import (
 	"errors"
@@ -14,13 +14,17 @@ type StringService interface {
 
 type stringService struct{}
 
-func (stringService) Uppercase(s string) (string, error) {
+func New() StringService {
+	return &stringService{}
+}
+
+func (ss *stringService) Uppercase(s string) (string, error) {
 	if s == "" {
 		return "", ErrEmpty
 	}
 	return strings.ToUpper(s), nil
 }
 
-func (stringService) Count(s string) int {
+func (ss *stringService) Count(s string) int {
 	return len(s)
 }

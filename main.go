@@ -3,51 +3,19 @@ package main
 import (
 	"net/http"
 	"os"
-	"time"
 
-	"github.com/go-kit/kit/log"
 	httptransport "github.com/go-kit/kit/transport/http"
+	"github.com/go-kit/log"
+	"github.com/tnaucoin/stringsvc/pkg/middleware"
+	"github.com/tnaucoin/stringsvc/pkg/service"
 )
-
-type loggingMiddleware struct {
-	logger log.Logger
-	next   StringService
-}
-
-func (mw loggingMiddleware) Uppercase(s string) (output string, err error) {
-	defer func(begin time.Time) {
-		mw.logger.Log(
-			"method", "uppercase",
-			"input", s,
-			"output", output,
-			"err", err,
-			"took", time.Since(begin),
-		)
-	}(time.Now())
-	output, err = mw.next.Uppercase(s)
-	return
-}
-
-func (mw loggingMiddleware) Count(s string) (n int) {
-	defer func(begin time.Time) {
-		mw.logger.Log(
-			"method", "count",
-			"input", s,
-			"n", n,
-			"took", time.Since(begin),
-		)
-	}(time.Now())
-
-	n = mw.next.Count(s)
-	return
-}
 
 func main() {
 	logger := log.NewLogfmtLogger(os.Stderr)
 
-	var svc StringService
-	svc = stringService{}
-	svc = loggingMiddleware{logger, svc}
+	var svc service.StringService
+	svc = service.New()
+	svc = middleware.LoggingMiddleware{Logger: logger, Next: svc}
 
 	uppercaseHandler := httptransport.NewServer(
 		makeUppercaseEndpoint(svc),

@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/go-kit/kit/endpoint"
+	"github.com/tnaucoin/stringsvc/pkg/service"
 )
 
 type uppercaseRequest struct {
@@ -25,7 +26,7 @@ type countResponse struct {
 	V int `json:"v"`
 }
 
-func makeUppercaseEndpoint(svc StringService) endpoint.Endpoint {
+func makeUppercaseEndpoint(svc service.StringService) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(uppercaseRequest)
 		v, err := svc.Uppercase(req.S)
@@ -36,7 +37,7 @@ func makeUppercaseEndpoint(svc StringService) endpoint.Endpoint {
 	}
 }
 
-func makeCountEndpoint(svc StringService) endpoint.Endpoint {
+func makeCountEndpoint(svc service.StringService) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(countRequest)
 		v := svc.Count(req.S)
